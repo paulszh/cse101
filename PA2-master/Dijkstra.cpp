@@ -35,16 +35,19 @@ float dijkstra(Graph<T>& g, T src) {
 	priority_queue< pair<T,float> , vector<pair<T,float>>, compare<T>> pq;
 
 
+	//initialize the vertices and add to the priority_queue
 	for(auto it = vertices.begin();
 	it != vertices.end(); it++){
 		it -> second -> visited = false;
 		it -> second -> prev = 0;
+
 		if(it->first == src){
 			it -> second -> distance = 0;
 		}
 		else{
 			it -> second -> distance = FLT_MAX;
 		}
+
 		pair<T,float> v(it->first, it->second->distance);
 		pq.push(v);
 
@@ -55,22 +58,27 @@ float dijkstra(Graph<T>& g, T src) {
 		pair<T,float> pair = pq.top();
 
 		pq.pop();
-
 		T u = pair.first;
 
-		for(auto it = vertices[u]->edges.begin();it != vertices[u]->edges.end(); it++){
+		//update the value of cost
+		if(vertices[u]->distance != FLT_MAX){
+			cost+= g.get_weight(vertices[u]->prev,u);
+		}
+
+		for(auto it = vertices[u]->edges.begin();
+		it != vertices[u]->edges.end(); it++){
 
 			T v = vertices[*it]->id;
 			float alt = vertices[u]->distance + g.get_weight(u,v);
+
+			//relax the edges for all the vertices
 			if(alt < vertices[v]->distance){
 				vertices[v]->distance = alt;
 				vertices[v]->prev = u;
-				cost+= g.get_weight(u,v);
 			}
 		}
 
 	}
-
 	// TODO: Problem 1
 
 	return cost;
