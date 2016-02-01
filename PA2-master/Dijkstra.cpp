@@ -20,57 +20,60 @@ struct compare
 {
 	//dist[v]
 	bool operator () ( const pair<T,float> u, const pair<T,float> v){
-		return u.second < v.second;
+		return u.second > v.second;
 	}
 };
 
 
 template <class T>
 float dijkstra(Graph<T>& g, T src) {
-    float cost = 0.0;
+	float cost = 0.0;
 
-    unordered_map<T, Vertex<T> *> vertices = g.vertices;
-    map<Edge<T>, float> weight = g.weights;
+	unordered_map<T, Vertex<T> *> vertices = g.vertices;
+	map<Edge<T>, float> weight = g.weights;
 
-    priority_queue< pair<T,float> , vector<pair<T,float>>, compare<T> > pq;
+	priority_queue< pair<T,float> , vector<pair<T,float>>, compare<T>> pq;
 
 
-    for(auto it = vertices.begin();
-        it != vertices.end(); it++){
-    	it -> second -> visited = false;
-    	it -> second -> distance = FLT_MAX;
-    	it -> second -> prev = 0;
+	for(auto it = vertices.begin();
+	it != vertices.end(); it++){
+		it -> second -> visited = false;
+		it -> second -> prev = 0;
+		if(it->first == src){
+			it -> second -> distance = 0;
+		}
+		else{
+			it -> second -> distance = FLT_MAX;
+		}
+		pair<T,float> v(it->first, it->second->distance);
+		pq.push(v);
 
-    	pair<T,float> v(it->first, it->second->distance);
-    	pq.push(v);
-    }
+	}
 
-    vertices[src]->distance = 0;
+	while(!pq.empty()){
 
-    while(!pq.empty()){
+		pair<T,float> pair = pq.top();
 
-    	pair<T,float> pair = pq.top();
-    	pq.pop();
+		pq.pop();
 
-    	Vertex<T> u = pair.first;
+		T u = pair.first;
 
-    	for(auto it = u.edges.begin(); 
-	    it != u.edges.end(); it++){
+		for(auto it = vertices[u]->edges.begin();it != vertices[u]->edges.end(); it++){
 
-    		Vertex<T> v = vertices[*it]->id;
-    		float alt = u.distance + g.get_weight(u.id, v.id);
+			T v = vertices[*it]->id;
+			float alt = vertices[u]->distance + g.get_weight(u,v);
+			if(alt < vertices[v]->distance){
+				vertices[v]->distance = alt;
+				vertices[v]->prev = u;
+				cost+= g.get_weight(u,v);
+			}
+		}
 
-    		if(alt < v.distance){
-    			vertices[*it]->id = alt;
-    			vertices[*it]->prev = u.id;
-    		}
-	    }
+	}
 
-    }
+	// TODO: Problem 1
 
-    // TODO: Problem 1
-
-    return cost;
+	return cost;
 }
 
 #endif
