@@ -60,6 +60,8 @@ float dijkstra(Graph<T>& g, T src) {
 		pq.pop();
 		T u = pair.first;
 
+		cout<< "v:" << u << " cost:"<< vertices[u]->distance << endl;
+
 		//update the value of cost
 		if(vertices[u]->distance != FLT_MAX){
 			cost+= g.get_weight(vertices[u]->prev,u);
