@@ -44,9 +44,14 @@ float prim(Graph<T>& g, T src) {
 		else{
 			it -> second -> distance = FLT_MAX;
 		}
-		pair<T,float> v(it->first, it->second->distance);
-		pq.push(v);
+
+		 // pair<T,float> v(it->first, it->second->distance);
+		 // pq.push(v);
+		
 	}
+
+	  pair<T,float> v(src, vertices[src]->distance);
+	  pq.push(v);
 
 
 	//Loop for |V| - 1 times
@@ -57,11 +62,13 @@ float prim(Graph<T>& g, T src) {
 		pq.pop();
 		T u = pair.first;
 
+		if(vertices[u]->visited) continue;
+
 		cout<< "v:" << u << " cost:"<< vertices[u]->distance << endl;
 
 		cost+= g.get_weight(vertices[u]->prev,u);
 
-		//vertices[u]->visited = true;
+		vertices[u]->visited = true;
 
 		for(auto it = vertices[u]->edges.begin();
 		it != vertices[u]->edges.end(); it++){
@@ -69,10 +76,14 @@ float prim(Graph<T>& g, T src) {
 			T v = vertices[*it]->id;
 			float alt = g.get_weight(u,v);
 
+			if(g.vertices[v]->visited){
+                continue;
+            }
 			//relax the edges for all the vertices
-			if( alt < vertices[v]->distance){
+			if(alt < vertices[v]->distance){
 				vertices[v]->distance = alt;
 				vertices[v]->prev = u;
+				pq.push(make_pair(v,alt));
 			}
 		}
 	}
