@@ -19,8 +19,8 @@ template <class T>
 struct compare
 {
 	//dist[v]
-	bool operator () ( const pair<T,float> u, const pair<T,float> v){
-		return u.second > v.second;
+	bool operator () ( const Vertex<T> * u, const Vertex<T> * v){
+		return u->distance > v->distance;
 	}
 };
 
@@ -32,7 +32,7 @@ float dijkstra(Graph<T>& g, T src) {
 	unordered_map<T, Vertex<T> *> vertices = g.vertices;
 	map<Edge<T>, float> weight = g.weights;
 
-	priority_queue< pair<T,float> , vector<pair<T,float>>, compare<T>> pq;
+	priority_queue< Vertex<T> * , vector<Vertex<T> *>, compare<T>> pq;
 
 
 	//initialize the vertices and add to the priority_queue
@@ -48,19 +48,19 @@ float dijkstra(Graph<T>& g, T src) {
 			it -> second -> distance = FLT_MAX;
 		}
 
-		pair<T,float> v(it->first, it->second->distance);
-		pq.push(v);
+		pq.push(it->second);
 
 	}
 
 	while(!pq.empty()){
 
-		pair<T,float> pair = pq.top();
+		Vertex<T> * pair = pq.top();
 
 		pq.pop();
-		T u = pair.first;
+		T u = pair -> id;
 
-		cout<< "v:" << u << " cost:"<< vertices[u]->distance << endl;
+		cout<< "v:" << u << " cost:"<< vertices[u]->distance<< endl;
+		//cout<< " pair:"<< pair->distance << endl;
 
 		//update the value of cost
 		if(vertices[u]->distance != FLT_MAX){
