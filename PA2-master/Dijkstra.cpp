@@ -19,8 +19,8 @@ template <class T>
 struct compare
 {
 	//dist[v]
-	bool operator () ( const Vertex<T> * u, const Vertex<T> * v){
-		return u->distance > v->distance;
+	bool operator () ( const pair<T,float> u, const pair<T,float> v){
+		return u.second >= v.second;
 	}
 };
 
@@ -32,7 +32,7 @@ float dijkstra(Graph<T>& g, T src) {
 	unordered_map<T, Vertex<T> *> vertices = g.vertices;
 	map<Edge<T>, float> weight = g.weights;
 
-	priority_queue< Vertex<T> * , vector<Vertex<T> *>, compare<T>> pq;
+	priority_queue< pair<T,float> , vector<pair<T,float>>, compare<T>> pq;
 
 
 	//initialize the vertices and add to the priority_queue
@@ -48,35 +48,42 @@ float dijkstra(Graph<T>& g, T src) {
 			it -> second -> distance = FLT_MAX;
 		}
 
-		pq.push(it->second);
+		pair<T,float> vertex(it->first, it->second->distance);
+		pq.push(vertex);
 
 	}
 
 	while(!pq.empty()){
 
-		Vertex<T> * pair = pq.top();
+		pair<T,float> pair = pq.top();
 
 		pq.pop();
-		T u = pair -> id;
+      	T u = pair.first;
 
-		cout<< "v:" << u << " cost:"<< vertices[u]->distance<< endl;
-		//cout<< " pair:"<< pair->distance << endl;
+
 
 		//update the value of cost
-		if(vertices[u]->distance != FLT_MAX){
+		if(vertices[u]->distance != FLT_MAX && !vertices[u]->visited){
 			cost+= g.get_weight(vertices[u]->prev,u);
 		}
+        cout << "pop: " << u << "   cost:" << cost << endl;
+        g.vertices[u]->visited = true;
 
 		for(auto it = vertices[u]->edges.begin();
 		it != vertices[u]->edges.end(); it++){
 
 			T v = vertices[*it]->id;
+            if(g.vertices[v]->visited){
+                continue;
+            }
 			float alt = vertices[u]->distance + g.get_weight(u,v);
 
 			//relax the edges for all the vertices
 			if(alt < vertices[v]->distance){
 				vertices[v]->distance = alt;
 				vertices[v]->prev = u;
+                //pair<T,float> update = 
+                pq.push(make_pair(v,alt));
 			}
 		}
 
